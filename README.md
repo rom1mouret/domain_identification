@@ -169,6 +169,13 @@ This will require replacing `Center` with a continually trained model.
 We are not finding ourselves in the same vicious circle as the one we started with though,
 as abstract representations have a known, controllable shape and occupy significantly less storage space than raw sensory inputs.
 
+### Dynamic state matching
+
+In my implementation, `Center`'s predictions and `P`'s predictions are compared with one another via a simple Euclidean distance.
+Since we work under the assumption that `Center`'s prediction is always right, one can improve the domain inference algorithm by allowing `P` to temporarily nudge its weights to better match with `Center`'s prediction.
+Instead of minimum Euclidean distance, the criterion becomes the minimum change of weights required to align both predictions.
+
+
 ## How to replicate the results
 
 Download and unzip [recipes_raw.zip](https://storage.googleapis.com/recipe-box/recipes_raw.zip).
