@@ -6,13 +6,12 @@ import mmh3
 from typing import List
 
 
-
 class DataIterator:
     def __init__(self, sentences: list) -> None:
         self._sentences = sentences
         self._offset = 0
 
-    def reset(self, shuffle: bool=True) -> None:
+    def reset(self, shuffle=True) -> None:
         if shuffle:
             random.shuffle(self._sentences)
         else:

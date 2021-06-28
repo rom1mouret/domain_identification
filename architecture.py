@@ -1,6 +1,6 @@
-import torch
 import torch.nn as nn
-from nn_utils import MaskedConv1d, Permute, freeze
+from nn_utils import MaskedConv1d, Permute
+
 
 class Processor(nn.Module):
     def __init__(self, vocab_size, abstraction_dim) -> None:
@@ -19,7 +19,6 @@ class Processor(nn.Module):
 class AbstractToGoal(nn.Module):
     def __init__(self, vocab_size, abstraction_dim) -> None:
         super(AbstractToGoal, self).__init__()
-        embed_dim = 32
         self._net = nn.Sequential(
             nn.BatchNorm1d(abstraction_dim),
             nn.Conv1d(abstraction_dim, 256, kernel_size=1),

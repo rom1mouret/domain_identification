@@ -3,6 +3,7 @@ import torch
 import time
 import datetime
 
+
 class ScoreMetric:
     def __init__(self) -> None:
         self._sum = 0
@@ -37,6 +38,7 @@ def scoring(name, filename):
             f.write("%s: %s\n" % (today, msg))
     finally:
         pass
+
 
 @contextmanager
 def measure_time(title):

@@ -9,11 +9,13 @@ from tqdm import tqdm, trange
 
 from nn_utils import freeze
 from recipe_dataset import Dataset
-from abstract_machine import AbstractMachine
 from eval_utils import scoring, measure_time
 from architecture import Processor, AbstractToGoal, AbstractToAbstract
 
-device = "cuda:0"
+if torch.cuda.is_available():
+    device = "cuda"
+else:
+    device = "cpu"
 
 # architecture
 vocab_size = 4096
@@ -25,6 +27,7 @@ abstract_to_abstract = AbstractToAbstract(abstraction_dim).to(device)
 domains = list(range(7))
 experiment_name = "%i domains [dim=%i] P" % (len(domains), abstraction_dim)
 train_data1, train_data2, test_data = Dataset(sys.argv[2:]).split(0.75, 0.2, 0.05)
+
 
 def io(sentences: list, domain: int) -> Tuple[torch.Tensor, torch.Tensor, np.ndarray]:
     max_len = max(map(len, sentences))
@@ -126,7 +129,7 @@ for domain in progress_bar:
         processors.append(best_processor.eval())
 
 # domain identification evaluation
-with scoring(experiment_name, "domain_accuray.txt") as accuracy:
+with scoring(experiment_name, "domain_accuracy.txt") as accuracy:
     for correct_domain in trange(len(processors)):
         processor = processors[correct_domain]
         test_data.reset(shuffle=False)

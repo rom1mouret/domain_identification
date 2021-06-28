@@ -1,4 +1,3 @@
-
 ## Breaking Free from the Stability-Plasticity Dilemma with Domain Identification
 
 Arxiv link: soon
@@ -55,7 +54,7 @@ To avoid redundancy, the abstraction layer should be sized in
 proportion to the complexity of the tasks at hand. In other words,
 as we tackle more complex tasks, we can scale up our models and
 their abstraction layer, which in turn lowers the likelihood of catastrophic forgetting.
- 
+
 ### Architecture
 
 <p align="center">
@@ -69,16 +68,16 @@ This includes text, time series, video and reinforcement learning.
 
 In this architecture, the state at time T+1 is predicted by two entities.
 
-- a model or a program called Center that predicts the next state from the current state
-- a feature processor P that predicts the next state from observations alone.
+- a model or a program called `Center` that predicts the next state from the current state
+- a feature processor `P` that predicts the next state from observations alone.
 
 These two predictions will conflict.
-We resolve conflicts by choosing the domain hypothesis under which P agrees the most with Center,
+We resolve conflicts by choosing the domain hypothesis under which `P` agrees the most with `Center`,
 typically by minimizing the distance between Center’s prediction and P’s prediction
-under the constraint that Center’s prediction is fixed. 
+under the constraint that Center’s prediction is fixed.
 
 As a special case of this architecture,
-we will build P as a collection of non-overlapping neural networks P[1], P[2]…P[n].
+we will build `P` as a collection of non-overlapping neural networks P[1], P[2]…P[n].
 Each neural network is trained to process a different domain.
 While this simplifies the training algorithm and allows the system to instantiate domain-specialized networks,
 it is memory inefficient and misses on the opportunity to mutualize knowledge between domains.
@@ -96,7 +95,6 @@ Below, `A` will denote the Action network mapping abstract states to targets.
 
 
 #### Training
-
 
 - On a small number of arbitrary domains, train `P[0]` conjointly with `A` and `Center`, minimizing `l1+l2+l3`.
 - Freeze `P[0]` and `A`.
@@ -119,7 +117,7 @@ Therefore, they do not suffer from catastrophic forgetting.
 I will showcase the architecture with a language model trained on a
 [dataset of cooking recipes](https://eightportions.com/datasets/Recipes/#fn:1).
 
-Words of the recipes are randomly mapped to an integer between 0 and 4096 using a hash function. 
+Words of the recipes are randomly mapped to an integer between 0 and 4096 using a hash function.
 We create 7 domains by randomly permuting the mapping between words and indices,
 and bootstrap most of the architecture, including the abstraction layer, from one domain only.
 It is essentially the NLP version of Permuted MNIST.
@@ -167,16 +165,35 @@ The remaining unsolved problem is to detect when two unknown domains are the sam
 `Center` and `A` are frozen after training.
 This is suitable for domain incremental learning but doesn’t leave any room for new abstractions and new targets.
 It is worth considering relaxing the constraints imposed by the frozen networks and letting processors add new abstractions.
-This will require replacing Center with a continually trained model.
+This will require replacing `Center` with a continually trained model.
 We are not finding ourselves in the same vicious circle as the one we started with though,
 as abstract representations have a known, controllable shape and occupy significantly less storage space than raw sensory inputs.
 
-
 ## How to replicate the results
+
+Download and unzip [recipes_raw.zip](https://storage.googleapis.com/recipe-box/recipes_raw.zip).
+
+Run the following commands.
 
 ```bash
 python3 eval_lm.py 16 recipes_raw_nosource_ar.json
 python3 eval_lm.py 32 recipes_raw_nosource_ar.json
 python3 eval_lm.py 48 recipes_raw_nosource_ar.json
 ```
-Requirements: pytorch, numpy, tqdm
+
+Repeat this procedure a handful of times and collect the results in your working directory.
+- domain_accuracy.txt
+- LM_accuracy.txt
+- LM_target_proba.txt
+
+
+Tested on Ubuntu 20.04 with versions:
+
+| name    | version |
+|---------|---------|
+| cuda    | 11.2    |
+| python  | 3.8.5   |
+| torch   | 1.9.0   |
+| numpy   | 1.21.0  |
+| tqdm    | 4.61.1  |
+| mmh3    | 3.0.0   |
