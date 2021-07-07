@@ -126,16 +126,19 @@ Feature processors are implemented as masked convolution networks.
 `Center` and `A` are implemented as multi-layer perceptrons.
 
 
-| size of the abstraction layer        | 16     | 32     | 48     |
-|--------------------------------------|--------|--------|--------|
-| domain identification error rate     | 7.01%  | 2.32%  | 0.63%  |
-| LM accuracy                          | 51.19% | 57.15% | 58.46% |
-| Average probability of expected word | 0.41   | 0.45   | 0.46   |
+| size of the abstraction layer                  | 16     | 32     | 48     |
+|------------------------------------------------|--------|--------|--------|
+| domain identification error rate (AVG)         | 7.31%  | 2.23%  | 0.77%  |
+| domain identification error rate (STD)         | 0.79%  | 0.70%  | 0.33%  |
+| LM accuracy (AVG)                              | 54.10% | 57.24% | 58.20% |
+| LM accuracy (STD)                              | 0.19%  | 0.57%  | 0.63%  |
+| softmax probability of expected word (AVG)     | 0.41   | 0.45   | 0.46   |
+| softmax probability of expected word (STD)     | 0.002  | 0.004  | 0.005  |
 
 As you can see, the domain identification error rate plummets as we
 increase the size of the abstraction layer.
-From size=16 to size=32, it is divided by 3.
-From size=32 to size=48, it is further divided by 3.7.
+From size=16 to size=32, it is divided by 3.3.
+From size=32 to size=48, it is further divided by 2.9.
 
 The accuracy of the language model doesn’t significantly increase as the abstraction layer gets wider.
 In this instance, this goes to show that the measured domain identification error rate is not a mere
