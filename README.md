@@ -1,12 +1,15 @@
-## Breaking Free from the Stability-Plasticity Dilemma with Domain Identification
+## Breaking Free From the Stability-Plasticity Dilemma With Incremental Domain Identification
 
-Arxiv link: soon
+Paper link: [pdf](prior_domain_identification.pdf)
 
-I make the case for identifying the input domain prior to running the main model and propose
-an architecture that opens the door to single-head continual learning (CL) systems that forget
-at a decreasing rate as the tasks grow in complexity.
-The proposed model accurately identifies domains and is compatible with other CL algorithms,
-provided they benefit from knowing the current domain beforehand.
+arXiv link: soon
+
+I make the case for identifying the input domain prior to running
+downstream models and propose an architecture that opens the door to single-head
+lifelong learning systems that forget at a decreasing rate as the tasks
+grow in complexity.
+The proposed model accurately identifies domains and is compatible with other
+continual learning algorithms, provided they benefit from knowing the current domain beforehand.
 
 ### Catastrophic forgetting
 
