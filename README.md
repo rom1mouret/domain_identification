@@ -147,6 +147,34 @@ The accuracy of the language model doesn’t significantly increase as the abstr
 In this instance, this goes to show that the measured domain identification error rate is not a mere
 consequence of increasing the main accuracy.
 
+
+## Domain boundaries at training
+
+I suggest that we simply give up on detecting domain boundaries.
+Instead of creating a new processor for each domain, we would do so for each new "context".
+
+Contexts are created by lumping together any new observations if they happen in the same timeframe,
+e.g. 10 minutes, regardless of whether they belong to the same domain or not.
+
+<p align="center">
+  <img src="contexts.png">
+</p>
+
+The testing setup is different than in the first experiment in several respects:
+- The system doesn’t have access to the correct previous abstract state. As a matter of fact, there is no correct abstract state because each context has a slightly different abstract interpretation of their respective domain.
+- Context inference is performed at the sequence level, counting discrepancies along the entire sequences and calculating the final score with a product of distances (sum of log distances for numerical stability).
+- We measure domain identification accuracy by mapping back the contexts to their respective domain.
+- The shortest recipe instructions were skipped in order to avoid nearly impossible inference cases.
+
+Here are the results with 105 contexts spanning over 7 domains:
+
+| size of the abstraction layer                  | 16     | 32     |
+|------------------------------------------------|--------|--------|
+| domain identification error rate (AVG)         | 28.7%  | 16.3%  |
+| domain identification error rate (STD)         | 7.76   | 10.3   |
+
+It shows similar trends, but the numbers are not as convincing.
+
 ## Limitations and future work
 ### Biological plausibility
 
@@ -157,14 +185,6 @@ properties which are speculated to be key characteristics of brains.
 the flow of information also goes from abstract representations to sensory input processors (top down).
 - The way `Center` connects `state(t)` and to `state(t+1)` paves the way for new architectures
 where abstract representations would have an unambiguous causal power on the next states.
-
-### Domain boundaries at training
-
-The algorithm section assumes that domains are known at training time.
-Since it is possible to identify domains during inference,
-one can utilize a similar process and a distance threshold to detect unknown domains.
-
-The remaining unsolved problem is to detect when two unknown domains are the same.
 
 ### Task diversity
 
@@ -199,14 +219,21 @@ Repeat this procedure a handful of times and collect the results in your working
 - LM_accuracy.txt
 - LM_target_proba.txt
 
+For the second experiment,
+
+```bash
+python3 eval_taskless.py 16 recipes_*.json
+python3 eval_taskless.py 32 recipes_*.json
+```
+
 
 Tested on Ubuntu 20.04 with versions:
 
-| name    | version |
-|---------|---------|
-| cuda    | 11.2    |
-| python  | 3.8.5   |
-| torch   | 1.9.0   |
-| numpy   | 1.21.0  |
-| tqdm    | 4.61.1  |
-| mmh3    | 3.0.0   |
+| name    | version       |
+|---------|---------------|
+| cuda    | 11.2, 11.4    |
+| python  | 3.8.5, 3.8.10 |
+| torch   | 1.9.0         |
+| numpy   | 1.21.0        |
+| tqdm    | 4.61.1        |
+| mmh3    | 3.0.0         |

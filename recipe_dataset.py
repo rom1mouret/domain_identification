@@ -15,14 +15,22 @@ class DataIterator:
         if shuffle:
             random.shuffle(self._sentences)
         else:
-            # model will be faster with sentences sorted by size
-            self._sentences = sorted(self._sentences, key=len)
+            # model will run faster with sentences sorted by size
+            self._sentences.sort(key=len)
         self._offset = 0
 
-    def get(self, n: int) -> list:
-        next_offset = min(len(self._sentences), self._offset + n)
-        result = self._sentences[self._offset:next_offset]
-        self._offset = next_offset
+    def get(self, n: int, min_len: int=1) -> list:
+        if min_len == 1:
+            next_offset = min(len(self._sentences), self._offset + n)
+            result = self._sentences[self._offset:next_offset]
+            self._offset = next_offset
+        else:
+            result = []
+            while len(result) < n and self._offset < len(self._sentences):
+                candidate = self._sentences[self._offset]
+                if len(candidate) >= min_len:
+                    result.append(candidate)
+                self._offset += 1
         return result
 
     def empty(self) -> bool:
@@ -30,7 +38,7 @@ class DataIterator:
 
 
 class Dataset:
-    def __init__(self, json_files: list) -> None:
+    def __init__(self, json_files: list, min_len: int=1, rm_duplicates: bool=False) -> None:
         """ json from
         https://eightportions.com/datasets/Recipes/#fn:1
         """
@@ -38,7 +46,7 @@ class Dataset:
         numbers = re.compile("[0-9]+")
         spaces = re.compile("[ ]+")
         punct = re.compile("[,;&()]")
-        self._sentences = []
+        sentences = []
         for json_file in json_files:
             with open(json_file, "r") as f:
                 content = json.load(f)
@@ -50,10 +58,19 @@ class Dataset:
                             s = punct.sub(" ", s)
                             s = s.strip()
                             if s:
-                                words = np.array([
+                                words = tuple([
                                     mmh3.hash(w) for w in spaces.split(s)
-                                ], dtype=np.uint32)
-                                self._sentences.append(words)
+                                ])
+                                if len(words) >= min_len:
+                                    sentences.append(words)
+        if rm_duplicates:
+            size_before = len(sentences)
+            sentences = list(set(sentences))
+            size_after = len(sentences)
+            print("duplicates removed:", size_before - size_after, "/", size_before)
+
+        self._sentences = [np.array(words, dtype=np.uint32) for words in sentences]
+        print("number of sentences:", len(self._sentences))
 
     def split(self, *ratios) -> List[DataIterator]:
         random.shuffle(self._sentences)

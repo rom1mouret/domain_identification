@@ -21,7 +21,7 @@ class ScoreMetric:
 
 
 @contextmanager
-def scoring(name, filename):
+def scoring(name, filename=None):
     try:
         before = time.time()
         with torch.no_grad():
@@ -33,9 +33,10 @@ def scoring(name, filename):
         total = metric.total()
         msg = "%s : avg=%.2f (total: %i)" % (name, score, total)
         print(msg)
-        today = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-        with open(filename, "a") as f:
-            f.write("%s: %s\n" % (today, msg))
+        if filename:
+            today = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            with open(filename, "a") as f:
+                f.write("%s: %s\n" % (today, msg))
     finally:
         pass
 

@@ -71,7 +71,7 @@ with measure_time("abstraction building"):
             progress_bar.set_description("loss: %.5f" % running_loss)
 
 for net in (processor, predictor):
-    freeze(predictor)
+    freeze(net)
 
 # fine-tune abstract_to_abstract
 optimizer = torch.optim.Adam(abstract_to_abstract.parameters(), lr=0.001)
@@ -94,7 +94,7 @@ with measure_time("fine tuning"):
 
 freeze(abstract_to_abstract)
 
-# training
+# main training
 processors = []
 loss_func = nn.CrossEntropyLoss()
 progress_bar = tqdm(domains, total=len(domains))
